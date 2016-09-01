@@ -15,8 +15,10 @@ import android.util.SparseArray;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.utils.ComponentUtils;
+import com.lody.virtual.helper.utils.VLog;
 
 import java.util.Iterator;
+import java.util.List;
 
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_INSTANCE;
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TASK;
@@ -273,7 +275,25 @@ import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP;
 				}
 			}
 		} else if (clearTarget != ClearTarget.TOP && ComponentUtils.isSameIntent(intent, reuseTask.taskRoot)) {
-			mAM.moveTaskToFront(reuseTask.taskId, 0);
+			/* FIXME: the `getRecentTasks` is deprecated, be careful */
+			List<ActivityManager.RecentTaskInfo> recentTask = mAM.getRecentTasks(Integer.MAX_VALUE,
+					ActivityManager.RECENT_WITH_EXCLUDED | ActivityManager.RECENT_IGNORE_UNAVAILABLE);
+			boolean taskIsAlive = false;
+			for (ActivityManager.RecentTaskInfo taskInfo : recentTask) {
+				if (taskInfo.userId == reuseTask.userId &&
+						taskInfo.id == reuseTask.taskId) {
+					taskIsAlive = true;
+					break;
+				}
+			}
+
+			if (taskIsAlive) {
+				mAM.moveTaskToFront(reuseTask.taskId, 0);
+			} else {
+				//TODO: the task has been removed by AMS with `removeTask`, but the process is still alive.
+				VLog.d("prife", "hello, world");
+			}
+
 			// In this case, we only need to move the task to front.
 
 		} else {
