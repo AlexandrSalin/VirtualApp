@@ -258,8 +258,7 @@ import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP;
 
 		boolean taskMarked = false;
 		if (reuseTask == null) {
-			destIntent = startActivityProcess(userId, null, intent, info
-			);
+			destIntent = startActivityProcess(userId, null, intent, info);
 			if (destIntent != null) {
 				destIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				destIntent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
@@ -291,7 +290,21 @@ import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP;
 				mAM.moveTaskToFront(reuseTask.taskId, 0);
 			} else {
 				//TODO: the task has been removed by AMS with `removeTask`, but the process is still alive.
-				VLog.d("prife", "hello, world");
+				destIntent = startActivityProcess(userId, null, intent, info);
+				if (destIntent != null) {
+					destIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					destIntent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+					destIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+						destIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+					else
+						destIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+						VirtualCore.get().getContext().startActivity(destIntent, options);
+					} else {
+						VirtualCore.get().getContext().startActivity(destIntent);
+					}
+				}
 			}
 
 			// In this case, we only need to move the task to front.
