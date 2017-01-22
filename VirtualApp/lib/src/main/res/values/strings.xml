@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="virtual_installer">VirtualPackage Installer</string>
+    <string name="virtual_installer">PrivaSee Package Installer</string>
     <string name="owner_name">Admin</string>
     <string name="choose">Choose</string>
     <string name="choose_empty">Chooser is Empty</string>
